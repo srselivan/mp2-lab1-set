@@ -13,6 +13,7 @@ static TBitField FAKE_BITFIELD(1);
 
 TBitField::TBitField(int len)
 {
+    if (len < 0) throw len;
     MemLen = (len - 1) / 32 + 1;
     BitLen = len;
     pMem = new TELEM[MemLen];
@@ -64,12 +65,16 @@ void TBitField::SetBit(const int n) // установить бит
 
 void TBitField::ClrBit(const int n) // очистить бит
 {
-    pMem[GetMemIndex(n)] &= GetMemMask(n);
+    if (n < 0 || n >= BitLen)
+        throw n;
+    pMem[GetMemIndex(n)] &= ~GetMemMask(n);
 }
 
 int TBitField::GetBit(const int n) const // получить значение бита
 {
-    return (pMem[GetMemIndex(n)] & GetMemMask(n));
+    if (n < 0 || n >= BitLen)
+        throw n;
+    return pMem[GetMemIndex(n)] & GetMemMask(n);
     //return FAKE_INT;
 }
 
