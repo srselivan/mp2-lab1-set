@@ -98,27 +98,68 @@ TBitField& TBitField::operator=(const TBitField &bf) // присваивание
 
 int TBitField::operator==(const TBitField &bf) const // сравнение
 {
-  return FAKE_INT;
+    if (BitLen == bf.BitLen) {
+        for (int i = 0; i < MemLen; i++)
+            if (pMem[i] != bf.pMem[i])
+                return false;
+        return true;
+    }
+    return false;
 }
 
 int TBitField::operator!=(const TBitField &bf) const // сравнение
 {
-  return FAKE_INT;
+    if (*this == bf) return false;
+    return true;
 }
 
 TBitField TBitField::operator|(const TBitField &bf) // операция "или"
 {
-    return FAKE_BITFIELD;
+    TBitField _bf(1);
+    if (bf.BitLen > BitLen)
+    {
+        _bf = bf;
+        for (int i = 0; i < _bf.MemLen; i++)
+            _bf.pMem[i] |= pMem[i];
+    }
+    else
+    {
+        _bf = *this;
+        for (int i = 0; i < _bf.MemLen; i++)
+            _bf.pMem[i] |= bf.pMem[i];
+    }
+    return _bf;
 }
 
 TBitField TBitField::operator&(const TBitField &bf) // операция "и"
 {
-    return FAKE_BITFIELD;
+    TBitField _bf(1);
+    if (bf.BitLen > BitLen)
+    {
+        _bf = bf;
+        for (int i = 0; i < _bf.MemLen; i++)
+            _bf.pMem[i] &= pMem[i];
+    }
+    else
+    {
+        _bf = *this;
+        for (int i = 0; i < _bf.MemLen; i++)
+            _bf.pMem[i] &= bf.pMem[i];
+    }
+    return _bf;
 }
 
 TBitField TBitField::operator~(void) // отрицание
 {
-    return FAKE_BITFIELD;
+    TBitField invert_bf(*this);
+    for (int i = 0; i < MemLen - 1; i++)
+        invert_bf.pMem[i] = ~invert_bf.pMem[i];
+    for (int i = (MemLen - 1) * 32; i < invert_bf.BitLen; i++)
+    {
+        if (GetBit(i)) invert_bf.ClrBit(i);
+        else invert_bf.SetBit(i);
+    }
+    return invert_bf;
 }
 
 // ввод/вывод
@@ -130,5 +171,8 @@ istream &operator>>(istream &istr, TBitField &bf) // ввод
 
 ostream &operator<<(ostream &ostr, const TBitField &bf) // вывод
 {
+    for (int i = 0; i < bf.BitLen; i++)
+        if (bf.GetBit(i)) ostr << 1;
+        else ostr << 0;
     return ostr;
 }
