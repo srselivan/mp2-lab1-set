@@ -166,6 +166,12 @@ TBitField TBitField::operator~(void) // отрицание
 
 istream &operator>>(istream &istr, TBitField &bf) // ввод
 {
+    for (int i = 0; i < bf.BitLen; i++)
+    {
+        char c;
+        istr >> c;
+        if (c == '1') bf.SetBit(i);
+    }
     return istr;
 }
 
